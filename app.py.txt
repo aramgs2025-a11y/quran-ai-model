@@ -1,0 +1,17 @@
+import streamlit as st
+
+# Title of your app
+st.title("📖 Quranic Auto-Correction AI")
+
+# Simple text area for user input
+user_input = st.text_area("Enter a Quranic Verse (Arabic):", placeholder="e.g. الحمد لله رب العالمين")
+
+if st.button("Check Accuracy"):
+    if user_input:
+        # This is where your AI model logic will eventually go.
+        # For now, we simulate a response:
+        st.success("Analysis Complete!")
+        st.write(f"Your input: {user_input}")
+        st.info("Note: AI model integration in progress...")
+    else:
+        st.warning("Please enter some text first.")

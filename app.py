@@ -1,31 +1,46 @@
 import streamlit as st
 import pandas as pd
+from fuzzywuzzy import fuzz
 
-st.set_page_config(page_title="Quranic AI", page_icon="📖")
+st.set_page_config(page_title="Quranic AI Checker", page_icon="📖")
 
-# 1. Load the Data
 @st.cache_data
 def load_data():
     return pd.read_csv("quran_text.csv")
 
-# We use a simple check to make sure the file loads
-try:
-    df = load_data()
-    st.title("📖 Quranic Auto-Correction AI")
-    st.success("Database Loaded Successfully!")
+df = load_data()
 
-    # 2. Search Section
-    st.subheader("Find a Verse")
-    surah_num = st.number_input("Surah Number", min_value=1, max_value=114, value=1)
-    ayah_num = st.number_input("Ayah Number", min_value=1, value=1)
+st.title("📖 Quranic Auto-Correction AI")
 
-    if st.button("Show Verse"):
-        result = df[(df['surah'] == surah_num) & (df['ayah'] == ayah_num)]
-        if not result.empty:
-            st.info(result.iloc[0]['text'])
+# --- SEARCH SECTION ---
+st.subheader("1. Select Verse")
+col1, col2 = st.columns(2)
+with col1:
+    surah = st.number_input("Surah", min_value=1, max_value=114, value=1)
+with col2:
+    ayah = st.number_input("Ayah", min_value=1, value=1)
+
+result = df[(df['surah'] == surah) & (df['ayah'] == ayah)]
+
+if not result.empty:
+    correct_text = result.iloc[0]['text']
+    
+    # --- TESTING SECTION ---
+    st.subheader("2. Test Your Accuracy")
+    user_input = st.text_area("Type the verse here:")
+
+    if st.button("Check My Typing"):
+        if user_input:
+            # AI Similarity Calculation
+            score = fuzz.ratio(user_input, correct_text)
+            
+            if score == 100:
+                st.success(f"Perfect! Accuracy: {score}% ✅")
+            elif score > 80:
+                st.warning(f"Almost there! Accuracy: {score}%. Check your diacritics.")
+                st.write(f"**Correct version:** {correct_text}")
+            else:
+                st.error(f"Low Accuracy: {score}%. Keep practicing!")
+                st.write(f"**Target text:** {correct_text}")
         else:
-            st.warning("Verse not found in your CSV.")
-
-except Exception as e:
-    st.error("Error: Could not find 'quran_text.csv'.")
-    st.write("Please make sure the file name on GitHub matches exactly.")
+            st.info("Please type something to check.")

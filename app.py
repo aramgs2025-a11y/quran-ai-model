@@ -34,6 +34,38 @@ try:
             st.success(result.iloc[0]['text'])
         else:
             st.warning("Verse not found. Check your CSV data.")
+            import streamlit as st
+import pandas as pd
+
+@st.cache_data
+def load_data():
+    return pd.read_csv("quran_text.csv")
+
+df = load_data()
+
+st.title("📖 Quranic Auto-Correction AI")
+
+# --- SECTION 1: SEARCH ---
+st.subheader("1. Find the Correct Verse")
+surah = st.number_input("Surah", min_value=1, max_value=114, value=1)
+ayah = st.number_input("Ayah", min_value=1, value=1)
+
+correct_text = ""
+result = df[(df['surah'] == surah) & (df['ayah'] == ayah)]
+if not result.empty:
+    correct_text = result.iloc[0]['text']
+    st.info(f"Correct Text: {correct_text}")
+
+# --- SECTION 2: AUTO-CORRECT TEST ---
+st.subheader("2. Test Your Typing")
+user_typing = st.text_area("Type the verse here to check for errors:")
+
+if st.button("Check My Accuracy"):
+    if user_typing.strip() == correct_text.strip():
+        st.success("✅ Perfect! Your typing matches the Quranic text exactly.")
+    else:
+        st.error("❌ There is a mistake. Please check your spelling or diacritics.")
+        st.write(f"**Should be:** {correct_text}")
 
 except Exception as e:
     st.error(f"Error loading data: {e}")

@@ -1,46 +1,33 @@
-import streamlit as st
-import pandas as pd
-from fuzzywuzzy import fuzz
 
-st.set_page_config(page_title="Quranic AI Checker", page_icon="📖")
-
-@st.cache_data
-def load_data():
-    return pd.read_csv("quran_text.csv")
-
-df = load_data()
-
-st.title("📖 Quranic Auto-Correction AI")
-
-# --- SEARCH SECTION ---
-st.subheader("1. Select Verse")
-col1, col2 = st.columns(2)
-with col1:
-    surah = st.number_input("Surah", min_value=1, max_value=114, value=1)
-with col2:
-    ayah = st.number_input("Ayah", min_value=1, value=1)
-
-result = df[(df['surah'] == surah) & (df['ayah'] == ayah)]
-
-if not result.empty:
-    correct_text = result.iloc[0]['text']
-    
-    # --- TESTING SECTION ---
-    st.subheader("2. Test Your Accuracy")
-    user_input = st.text_area("Type the verse here:")
-
-    if st.button("Check My Typing"):
-        if user_input:
-            # AI Similarity Calculation
-            score = fuzz.ratio(user_input, correct_text)
-            
-            if score == 100:
-                st.success(f"Perfect! Accuracy: {score}% ✅")
-            elif score > 80:
-                st.warning(f"Almost there! Accuracy: {score}%. Check your diacritics.")
-                st.write(f"**Correct version:** {correct_text}")
-            else:
-                st.error(f"Low Accuracy: {score}%. Keep practicing!")
-                st.write(f"**Target text:** {correct_text}")
-        else:
-            st.info("Please type something to check.")
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Al-Musahhih: AI Qur'an Mentor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+    .font-quran {
+      font-family: 'Amiri', serif;
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>
